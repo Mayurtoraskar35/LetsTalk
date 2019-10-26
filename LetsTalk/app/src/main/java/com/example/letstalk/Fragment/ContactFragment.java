@@ -52,7 +52,7 @@ public class ContactFragment extends Fragment {
 
     List<UserContact> userList;
 
-    List<String> userContactList;
+    //List<String> userContactList;
 
     private SharedPreferences mSharedPreferences;
 
@@ -107,7 +107,7 @@ public class ContactFragment extends Fragment {
 
         userList = new ArrayList<>();
 
-        userContactList = databaseHandler.displayUserID();
+        //userContactList = databaseHandler.displayUserID();
 
         //Log.d(TAG, "database Size: "+userContactList.size());
 
@@ -139,16 +139,8 @@ public class ContactFragment extends Fragment {
                             userContact.setUserMobile(userMobile);
                             userContact.setUserId(userID);
                             Log.d(TAG, "onDataChange: ");
-                            if(!userContactList.contains(userID))
-                            {
-                                Log.d(TAG, "onDataChange: inside If"+userList+"\n"+userID);
-                                databaseHandler.insertUser(userContact);
-                            }
-                            else{
-                                Log.d(TAG, "onDataChange: inside else"+userList+"\n"+userID);
-                            }
-                            Log.d(TAG, "Insert Tag");
-                            //userList.add(user);
+                            Log.d(TAG, "onDataChange: inside If"+userList+"\n"+userID);
+                            databaseHandler.insertUser(userContact);
                         }
                         else {
                             Log.d(TAG, "onDataChange: inside Else");
@@ -167,7 +159,7 @@ public class ContactFragment extends Fragment {
 
 
             Log.d(TAG, "onCreateView: ");
-            Log.d(TAG, "Database Size: "+databaseHandler.displayUserID().size());
+            //Log.d(TAG, "Database Size: "+databaseHandler.displayUserID().size());
         }catch (Exception e){
             Log.e(TAG, "Exception: "+e.toString());
         }

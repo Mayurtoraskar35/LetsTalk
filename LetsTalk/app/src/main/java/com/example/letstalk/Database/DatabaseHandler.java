@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.letstalk.LTModel.Chat;
 import com.example.letstalk.LTModel.Message;
 import com.example.letstalk.LTModel.UserContact;
 import com.example.letstalk.MessageActivity;
@@ -52,6 +53,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         public static final String TIME_STAMP = "time_stamp";
     }
 
+    public static class Chats {
+        public static final String TABLE_NAME = "chat";
+        public static final String CHATID = "chatid";
+        public static final String CONVERSION_ID = "conversion_id";
+        public static final String MESSAGE_ID = "message_id";
+    }
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         Log.d(TAG, "onCreate: DatabaseHandler");
@@ -59,8 +67,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Users.ID+" integer primary key AUTOINCREMENT, "+
                 Users.USER_NAME+" text, "+
                 Users.USER_SUR_NAME +" text, "+
-                Users.USER_MOBILE+" text, "+
-                Users.USER_ID +" text);";
+                Users.USER_MOBILE+" text UNIQUE, "+
+                Users.USER_ID +" text );";
         sqLiteDatabase.execSQL(createContactQuery);
 
         String createMessageQuery="create table "+ Messages.TABLE_NAME+" ( "+
@@ -71,6 +79,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Messages.BODY +" text, "+
                 Messages.TIME_STAMP+" text);";
         sqLiteDatabase.execSQL(createMessageQuery);
+
+        String createChatQuery="create table "+ Chats.TABLE_NAME+" ( "+
+                Chats.CHATID+" BigInt(20), "+
+                Chats.CONVERSION_ID +" text UNIQUE, "+
+                Chats.MESSAGE_ID +" text, " +
+                "FOREIGN KEY(" + Chats.MESSAGE_ID +") REFERENCES "+Messages.TABLE_NAME+"("+Messages.MESSAGE_ID+"));";
+        sqLiteDatabase.execSQL(createChatQuery);
     }
 
     public void insertMessage(Message message)
@@ -90,28 +105,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long row= database.insertWithOnConflict(Messages.TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_IGNORE);
         Log.d(TAG,"Inside insertStudent() -> Row : "+row);
 
-
         Intent intent = new Intent();
         intent.setAction(MessageActivity.MYFILTER);
         intent.putExtra("messageId",messageId);
         context.sendBroadcast(intent);
-    }
-
-    public List<String> displayUserID()
-    {
-        String id;
-        List<String> userID = new ArrayList<>();
-        SQLiteDatabase database= this.getReadableDatabase();
-        String query="SELECT * FROM "+Users.TABLE_NAME;
-        Cursor cursor=database.rawQuery(query,null);
-        Log.d(TAG,"Cursor Count: "+cursor.getCount());
-        while (cursor.moveToNext())
-        {
-            id = cursor.getString(cursor.getColumnIndex(Users.USER_ID));
-            userID.add(id);
-        }
-        cursor.close();
-        return userID;
     }
 
     public List<UserContact> displayUserContact()
@@ -155,12 +152,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(Users.USER_MOBILE,userContact.getUserMobile());
         contentValues.put(Users.USER_ID,userContact.getUserId());
         long row= database.insertWithOnConflict(Users.TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_IGNORE);
-        Log.d(TAG,"Inside insertStudent() -> Row : "+row);
+        Log.d(TAG,"Inside insertContact() -> Row : "+row);
     }
 
-
     public Message getMessageById(String messageId) {
-
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Messages.TABLE_NAME+" WHERE "+ Messages.MESSAGE_ID +" = '"+messageId+"' ;";
         Cursor cursor = database.rawQuery(query, null);
@@ -182,5 +177,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         cursor.close();
         return message;
+    }
+
+    public List<Message> getMessageData(String conversationID) {
+
+        SQLiteDatabase database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + Messages.TABLE_NAME+" WHERE "+ Messages.CONVERSION_ID +" = '"+conversationID+"' ;";
+        Cursor cursor = database.rawQuery(query, null);
+        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        List<Message> messagelist= new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            Message message = new Message();
+            Log.d(TAG, "getStudentData: ");
+            String senderId = cursor.getString(cursor.getColumnIndex(Messages.SENDER_ID));
+            String conversionId = cursor.getString(cursor.getColumnIndex(Messages.CONVERSION_ID));
+            String messageID = cursor.getString(cursor.getColumnIndex(Messages.MESSAGE_ID));
+            String body = cursor.getString(cursor.getColumnIndex(Messages.BODY));
+            String timeStamp =cursor.getString(cursor.getColumnIndex(Messages.TIME_STAMP));
+            message.setSenderId(senderId);
+            message.setConversionId(conversionId);
+            message.setMessageId(messageID);
+            message.setBody(body);
+            message.setTimeStamp(timeStamp);
+            messagelist.add(message);
+            Log.d(TAG, "getMessageData: Msg data "+body);
+            Log.d(TAG, "getMessageData: messagelist"+ messagelist.toString());
+        }
+        cursor.close();
+        return messagelist;
+    }
+
+    public List<Chat> getChatList()
+    {
+        SQLiteDatabase database = this.getReadableDatabase();
+        String query = "SELECT * FROM " + Chats.TABLE_NAME+
+                " INNER JOIN "+ Users.TABLE_NAME +
+                " ON "+ Users.USER_ID +" = "+ Chats.CONVERSION_ID +
+                " INNER JOIN "+ Messages.TABLE_NAME +
+                " ON "+ Messages.MESSAGE_ID +" = "+Chats.MESSAGE_ID
+                +" ;";
+        Cursor cursor = database.rawQuery(query, null);
+        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        List<Chat> chatList= new ArrayList<>();
+
+        while (cursor.moveToNext()) {
+            Chat chat = new Chat();
+            Log.d(TAG, "getStudentData: ");
+            String chatId = cursor.getString(cursor.getColumnIndex(Chats.CHATID));
+            String conversionId = cursor.getString(cursor.getColumnIndex(Chats.CONVERSION_ID));
+            String messageID = cursor.getString(cursor.getColumnIndex(Chats.MESSAGE_ID));
+            chat.setChatId(chatId);
+            chat.setConversionId(conversionId);
+            chat.setMessageId(messageID);
+            Log.d(TAG, "getChatData: Chat ID "+chatId);
+            Log.d(TAG, "getChatData: message ID"+ messageID);
+            Log.d(TAG, "getChatData: conversation ID"+ conversionId);
+            chatList.add(chat);
+        }
+        cursor.close();
+        return chatList;
     }
 }

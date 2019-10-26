@@ -1,17 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_alignParentEnd="true"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentRight="true">
+    android:orientation="vertical"
+    android:padding="8dp"
+    >
 
-    <TextView
-        android:id="@+id/sendermessagebody"
-        android:layout_alignParentEnd="true"
-        android:text="3333333333333333"
+    <androidx.cardview.widget.CardView
+        android:layout_gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true" />
+        android:orientation="vertical"
+        app:cardCornerRadius="15dp"
+        app:cardBackgroundColor="#B81596"
+        android:minWidth="80dp">
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/messagebody"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:foregroundGravity="right"
+        android:padding="8dp"
+        android:text="Hi"
+        android:textSize="14sp" />
+    </androidx.cardview.widget.CardView>
+    <TextView
+        android:text="02:12 PM"
+        android:id="@+id/timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        />
+
+</LinearLayout>

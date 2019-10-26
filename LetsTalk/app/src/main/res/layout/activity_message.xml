@@ -1,47 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#ECEFF1"
     android:layout_height="match_parent"
     tools:context=".MessageActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/msgtoolbar"
+        android:background="@color/colorPrimary"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/userimage"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/username"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/msgtoolbar"
+        android:id="@+id/message_reciever_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints" />
+
     <RelativeLayout
+
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#fff"
-        android:padding="5dp">
+        >
 
         <EditText
             android:id="@+id/Emessage"
+            android:padding="16dp"
+            android:textSize="14sp"
+            android:layout_marginEnd="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/sender"
-            android:background="@android:color/transparent"
-            android:hint="Type a messageEntity..." />
+            android:background="@drawable/roundtextview"
+            android:hint="Type a message..."
+            android:layout_marginRight="8dp" />
 
-        <ImageButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/sender"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:background="@mipmap/ic_action_name"
-            android:onClick="sendMessage" />
+            android:src="@drawable/ic_send_black_24dp"
+            android:onClick="sendMessage"
+            app:elevation="0dp"
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/message_reciever_recycler_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/message_sender_recycler_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

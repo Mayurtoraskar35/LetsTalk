@@ -1,5 +1,7 @@
 package com.example.letstalk;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,14 +11,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.letstalk.Adapter.MyRecieverMessageAdapter;
-import com.example.letstalk.Adapter.MySenderMessageAdapter;
 import com.example.letstalk.AppConstant.AppConstant;
 import com.example.letstalk.Database.DatabaseHandler;
 import com.example.letstalk.LTModel.Message;
@@ -25,8 +35,11 @@ import com.example.letstalk.Retrofit.Data;
 import com.example.letstalk.Retrofit.FCMAPI;
 import com.example.letstalk.Retrofit.MessageEntity;
 import com.example.letstalk.Utils.Utils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -40,33 +53,44 @@ public class MessageActivity extends AppCompatActivity {
 
     public static final String MYFILTER = "com.my.broadcast.RECEIVER";
 
+    ImageView userImage;
+
+    TextView userName;
+
     String reciverID, name, mobile, txtmessage, senderID, messageID;
 
     private long timeStamp;
 
-    ImageButton btnSend;
+    FloatingActionButton btnSend;
 
     EditText message;
 
     Context context;
 
-    private RecyclerView mMessageRecieverRecyclerView, mMessageSenderRecyclerView;
+    List<Message> messageList;
+
+    private RecyclerView mMessageRecyclerView;
 
     private MyRecieverMessageAdapter mMyRecieverMessageAdapter;
 
-    private MySenderMessageAdapter mMySenderMessageAdapter;
+    Toolbar toolbar;
 
     DatabaseHandler messageDatabaseHandler;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
+
+        toolbar = findViewById(R.id.msgtoolbar);
+
+        userImage = findViewById(R.id.userimage);
+        userName = findViewById(R.id.username);
+
         btnSend = findViewById(R.id.sender);
         message = findViewById(R.id.Emessage);
-        mMessageRecieverRecyclerView = findViewById(R.id.message_reciever_recycler_view);
-        mMessageSenderRecyclerView = findViewById(R.id.message_sender_recycler_view);
+        mMessageRecyclerView = findViewById(R.id.message_reciever_recycler_view);
+
         context = this;
         Intent intent = getIntent();
         reciverID = intent.getStringExtra("ReciverUserID");
@@ -76,22 +100,40 @@ public class MessageActivity extends AppCompatActivity {
         SharedPreferences preferences =getSharedPreferences(AppConstant.PREFERENCE_FILE_NAME,MODE_PRIVATE);
         senderID = preferences.getString(AppConstant.LOGGED_IN_USER_ID, "");
 
+        messageDatabaseHandler = new DatabaseHandler(this);
+        userName.setText(name);
+
+        messageList = new ArrayList<Message>();
+
         //Broadcast
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MYFILTER);
         registerReceiver(broadcastReceiver,intentFilter);
 
         //Setup recyclerview
-        mMessageRecieverRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mMyRecieverMessageAdapter = new MyRecieverMessageAdapter(context, new ArrayList<>());
-        mMessageRecieverRecyclerView.setAdapter(mMyRecieverMessageAdapter);
+        mMessageRecyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        mMessageSenderRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mMySenderMessageAdapter = new MySenderMessageAdapter(context, new ArrayList<>());
-        mMessageSenderRecyclerView.setAdapter(mMySenderMessageAdapter);
+        messageList = messageDatabaseHandler.getMessageData(reciverID);
 
+        Log.d(TAG, "onCreate: "+messageList);
 
-        messageDatabaseHandler = new DatabaseHandler(this);
+        //mMyRecieverMessageAdapter = new MyRecieverMessageAdapter(context, new ArrayList<>());
+        mMyRecieverMessageAdapter = new MyRecieverMessageAdapter(context,messageList);
+        mMessageRecyclerView.setAdapter(mMyRecieverMessageAdapter);
+
+        //Drawable drawablle =getResources().getDrawable(R.drawable.ic_send_black_24dp);
+        Drawable drawable = btnSend.getDrawable();
+        drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        //setupToolBar
+        setupToolbar();
+
+    }
+
+    public void setupToolbar(){
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
     }
 
     @Override
@@ -112,38 +154,20 @@ public class MessageActivity extends AppCompatActivity {
 
                 Log.d(TAG, "onReceive: senderID "+senderID);
 
-
                 //Get message data from database using messageId
                 DatabaseHandler handler = new DatabaseHandler(context);
-                Message message = handler.getMessageById(msgId);
-
-                Log.d(TAG, "onReceive: conversationId "+message.getConversionId());
-
-                if(senderID.equals(message.getSenderId()))
-                {
-                    mMyRecieverMessageAdapter.addMessageToAdapter(message);
-                }
-                else{
-                    mMySenderMessageAdapter.addMessageToAdapter(message);
-                }
-
-
+                Message msg = handler.getMessageById(msgId);
+                Log.d(TAG, "onReceive: conversationId "+msg.getConversionId());
+                mMyRecieverMessageAdapter.addMessageToAdapter(msg);
             }
-
         }
     };
 
     public void sendMessage(View view) {
-
         timeStamp = System.currentTimeMillis();
-
         String time= String.valueOf(timeStamp);
-
         txtmessage = message.getText().toString().replace(" ","_");
-
         messageID = Utils.generateUniqueMessageId();
-
-
         Log.d(TAG, "sendMessage: senderID"+senderID);
         Log.d(TAG, "sendMessage: recieverID"+reciverID);
         Log.d(TAG, "sendMessage: name"+ name);
@@ -203,5 +227,17 @@ public class MessageActivity extends AppCompatActivity {
 
         messageDatabaseHandler.insertMessage(message);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch(item.getItemId()) {
+            case android.R.id.home :
+                onBackPressed();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
