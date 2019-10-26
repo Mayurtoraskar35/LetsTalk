@@ -2,6 +2,7 @@ package com.example.letstalk.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,6 +100,15 @@ public class MyContactAdapter extends RecyclerView.Adapter<MyContactAdapter.MyVi
                 mContext.startActivity(intent);
             }
         });
+    }
+
+    public void setContactList(List<UserContact> contactList)
+    {
+        if(mUserList != null)
+            mUserList.clear();
+
+        mUserList = contactList;
+        notifyDataSetChanged();
     }
 
     @Override

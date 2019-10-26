@@ -72,7 +72,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(createContactQuery);
 
         String createMessageQuery="create table "+ Messages.TABLE_NAME+" ( "+
-                Messages.ID+" BigInt(20), "+
+                Messages.ID+" integer primary key AUTOINCREMENT, "+
                 Messages.SENDER_ID +" text, "+
                 Messages.CONVERSION_ID +" text, "+
                 Messages.MESSAGE_ID +" text, "+
@@ -81,7 +81,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(createMessageQuery);
 
         String createChatQuery="create table "+ Chats.TABLE_NAME+" ( "+
-                Chats.CHATID+" BigInt(20), "+
+                Chats.CHATID+" integer primary key AUTOINCREMENT, "+
                 Chats.CONVERSION_ID +" text UNIQUE, "+
                 Chats.MESSAGE_ID +" text, " +
                 "FOREIGN KEY(" + Chats.MESSAGE_ID +") REFERENCES "+Messages.TABLE_NAME+"("+Messages.MESSAGE_ID+"));";
@@ -105,10 +105,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         long row= database.insertWithOnConflict(Messages.TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_IGNORE);
         Log.d(TAG,"Inside insertStudent() -> Row : "+row);
 
+        Chat chat = new Chat();
+        chat.unreadCount=0;
+        chat.message = message;
+        insertChat(chat);
+
         Intent intent = new Intent();
         intent.setAction(MessageActivity.MYFILTER);
         intent.putExtra("messageId",messageId);
         context.sendBroadcast(intent);
+
+
+
+    }
+
+    public void insertChat(Chat chat)
+    {
+        SQLiteDatabase database=this.getWritableDatabase();
+        ContentValues contentValues= new ContentValues();
+        contentValues.put(Chats.CONVERSION_ID,chat.message.getConversionId());
+        contentValues.put(Chats.MESSAGE_ID,chat.message.getMessageId());
+        long row= database.insertWithOnConflict(Chats.TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_IGNORE);
+        Log.d(TAG,"Inside insertChat() -> Row : "+row);
     }
 
     public List<UserContact> displayUserContact()
@@ -116,7 +134,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Users.TABLE_NAME+";";
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        Log.d(TAG, "Cursor Count contact : " + cursor.getCount());
         List<UserContact> userContactList = new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -159,7 +177,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Messages.TABLE_NAME+" WHERE "+ Messages.MESSAGE_ID +" = '"+messageId+"' ;";
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        Log.d(TAG, "Cursor Count : msg " + cursor.getCount());
         Message message = new Message();
 
         while (cursor.moveToNext()) {
@@ -184,7 +202,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Messages.TABLE_NAME+" WHERE "+ Messages.CONVERSION_ID +" = '"+conversationID+"' ;";
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        Log.d(TAG, "Cursor Count message : " + cursor.getCount());
         List<Message> messagelist= new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -212,13 +230,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     {
         SQLiteDatabase database = this.getReadableDatabase();
         String query = "SELECT * FROM " + Chats.TABLE_NAME+
-                " INNER JOIN "+ Users.TABLE_NAME +
-                " ON "+ Users.USER_ID +" = "+ Chats.CONVERSION_ID +
-                " INNER JOIN "+ Messages.TABLE_NAME +
-                " ON "+ Messages.MESSAGE_ID +" = "+Chats.MESSAGE_ID
+                " JOIN "+ Users.TABLE_NAME +
+                " ON "+ Users.USER_ID +" = "+Chats.TABLE_NAME + "." + Chats.CONVERSION_ID +
+                " JOIN "+ Messages.TABLE_NAME +
+                " ON "+Messages.TABLE_NAME + "." + Messages.MESSAGE_ID +" = "+ Chats.TABLE_NAME + "." + Chats.MESSAGE_ID
                 +" ;";
+        Log.d(TAG, "getChatList: Query"+query);
         Cursor cursor = database.rawQuery(query, null);
-        Log.d(TAG, "Cursor Count : " + cursor.getCount());
+        Log.d(TAG, "Cursor Count chat : " + cursor.getCount());
         List<Chat> chatList= new ArrayList<>();
 
         while (cursor.moveToNext()) {
@@ -227,9 +246,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String chatId = cursor.getString(cursor.getColumnIndex(Chats.CHATID));
             String conversionId = cursor.getString(cursor.getColumnIndex(Chats.CONVERSION_ID));
             String messageID = cursor.getString(cursor.getColumnIndex(Chats.MESSAGE_ID));
-            chat.setChatId(chatId);
-            chat.setConversionId(conversionId);
-            chat.setMessageId(messageID);
+            chat.setChatId(Integer.parseInt(chatId));
+            chat.message.setConversionId(conversionId);
+            chat.message.setMessageId(messageID);
             Log.d(TAG, "getChatData: Chat ID "+chatId);
             Log.d(TAG, "getChatData: message ID"+ messageID);
             Log.d(TAG, "getChatData: conversation ID"+ conversionId);

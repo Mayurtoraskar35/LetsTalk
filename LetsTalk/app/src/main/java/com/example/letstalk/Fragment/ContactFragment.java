@@ -119,6 +119,7 @@ public class ContactFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Log.d(TAG, "onDataChange: "+dataSnapshot);
+                    List<UserContact> contactsList = new ArrayList<>();
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                         user = userSnapshot.getValue(User.class);
                         Log.d(TAG, "onDataChange: " + user);
@@ -141,6 +142,7 @@ public class ContactFragment extends Fragment {
                             Log.d(TAG, "onDataChange: ");
                             Log.d(TAG, "onDataChange: inside If"+userList+"\n"+userID);
                             databaseHandler.insertUser(userContact);
+                            contactsList.add(userContact);
                         }
                         else {
                             Log.d(TAG, "onDataChange: inside Else");
@@ -149,7 +151,7 @@ public class ContactFragment extends Fragment {
                         Log.d(TAG, "onDataChange: UserId  " +user.getUserId());
                     }
                     Log.d(TAG, "onDataChange: UserContactList "+ databaseHandler.displayUserContact());
-
+                    adapter.setContactList(contactsList);
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -165,6 +167,7 @@ public class ContactFragment extends Fragment {
         }
 
         adapter = new MyContactAdapter(context, databaseHandler.displayUserContact());
+
         Log.d(TAG, "after Send Adapter: " + adapter);
         Log.d(TAG, "onCreateView: " + userList);
         recyclerView.setAdapter(adapter);

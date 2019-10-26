@@ -97,6 +97,8 @@ public class MessageActivity extends AppCompatActivity {
         mobile = intent.getStringExtra("number");
         name = getIntent().getStringExtra("name");
 
+        toolbar.setTitleTextColor(Color.WHITE);
+
         SharedPreferences preferences =getSharedPreferences(AppConstant.PREFERENCE_FILE_NAME,MODE_PRIVATE);
         senderID = preferences.getString(AppConstant.LOGGED_IN_USER_ID, "");
 

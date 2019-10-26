@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,8 @@ import com.example.letstalk.R;
  * create an instance of this fragment.
  */
 public class ChatFragment extends Fragment {
+
+    private static final String TAG = "ChatFragment";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -72,6 +75,7 @@ public class ChatFragment extends Fragment {
         mContext = container.getContext();
         DatabaseHandler databaseHandler = new DatabaseHandler(mContext);
         databaseHandler.getChatList();
+        Log.d(TAG, "onCreateView: "+databaseHandler.getChatList());
         return view;
     }
 

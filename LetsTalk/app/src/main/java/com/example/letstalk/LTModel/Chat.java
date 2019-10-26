@@ -2,34 +2,43 @@ package com.example.letstalk.LTModel;
 
 public class Chat {
 
-    public String chatId;
+    public int chatId;
 
-    public String conversionId;
+    public int unreadCount;
 
-    public String messageId;
+    public Message message;
 
-    public String getChatId() {
+    public User user;
+
+    public int getChatId() {
         return chatId;
     }
 
-    public void setChatId(String chatId) {
+    public void setChatId(int chatId) {
         this.chatId = chatId;
     }
 
-    public String getConversionId() {
-        return conversionId;
+    public int getUnreadCount() {
+        return unreadCount;
     }
 
-    public void setConversionId(String conversionId) {
-        this.conversionId = conversionId;
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
-    public String getMessageId() {
-        return messageId;
+    public Message getMessage() {
+        return message;
     }
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
+    public void setMessage(Message message) {
+        this.message = message;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
