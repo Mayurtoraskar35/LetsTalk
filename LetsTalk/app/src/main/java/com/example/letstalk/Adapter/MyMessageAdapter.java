@@ -22,7 +22,7 @@ import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class MyRecieverMessageAdapter extends RecyclerView.Adapter<MyRecieverMessageAdapter.MyMessageViewHolder> {
+public class MyMessageAdapter extends RecyclerView.Adapter<MyMessageAdapter.MyMessageViewHolder> {
 
     String senderID;
 
@@ -30,13 +30,13 @@ public class MyRecieverMessageAdapter extends RecyclerView.Adapter<MyRecieverMes
 
     public static final int MSG_TYPE_RIGHT = 1;
 
-    private static final String TAG = "MyRecieverMessageAdapter";
+    private static final String TAG = "MyMessageAdapter";
 
     Context mContext;
 
     List<Message> mMessageList;
 
-    public MyRecieverMessageAdapter(Context context, List<Message> messageList){
+    public MyMessageAdapter(Context context, List<Message> messageList){
         mMessageList = messageList;
         mContext = context;
     }
@@ -47,16 +47,18 @@ public class MyRecieverMessageAdapter extends RecyclerView.Adapter<MyRecieverMes
 
         Log.d("123 ", "onCreateViewHolder: senderID : "+senderID);
 
+        //viewGroup.setClipToPadding(false);
+
         if (viewType == MSG_TYPE_RIGHT)
         {
             Log.d("123",  " If onCreateViewHolder: ");
             View view = LayoutInflater.from(mContext).inflate(R.layout.sender_message_recyclerview, viewGroup, false);
-            return new MyRecieverMessageAdapter.MyMessageViewHolder(view);
+            return new MyMessageAdapter.MyMessageViewHolder(view);
         }
         else {
             Log.d("123", "Else onCreateViewHolder: ");
             View view = LayoutInflater.from(mContext).inflate(R.layout.reciever_message_recyclerview, viewGroup, false);
-            return new MyRecieverMessageAdapter.MyMessageViewHolder(view);
+            return new MyMessageAdapter.MyMessageViewHolder(view);
         }
     }
 

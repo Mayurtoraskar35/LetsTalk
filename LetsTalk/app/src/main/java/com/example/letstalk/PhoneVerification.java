@@ -73,7 +73,7 @@ public class PhoneVerification extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        mSharedPreferences =getSharedPreferences(AppConstant.PREFERENCE_FILE_NAME,MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences(AppConstant.PREFERENCE_FILE_NAME,MODE_PRIVATE);
 
     }
 

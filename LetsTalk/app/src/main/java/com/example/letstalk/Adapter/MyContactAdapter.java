@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.letstalk.LTModel.User;
-import com.example.letstalk.LTModel.UserContact;
 import com.example.letstalk.MessageActivity;
 import com.example.letstalk.R;
 
@@ -26,13 +25,13 @@ public class MyContactAdapter extends RecyclerView.Adapter<MyContactAdapter.MyVi
 
     private static final String TAG = "MyContactAdapter";
 
-    private List<UserContact> mUserList;
+    private List<User> mUserList;
 
     private Context mContext;
 
-    UserContact user;
+    User user;
 
-    public MyContactAdapter(Context context, List<UserContact> userList){
+    public MyContactAdapter(Context context, List<User> userList){
         mUserList =userList;
         Log.d(TAG, "MyContactAdapter: "+mUserList);
         mContext = context;
@@ -102,7 +101,7 @@ public class MyContactAdapter extends RecyclerView.Adapter<MyContactAdapter.MyVi
         });
     }
 
-    public void setContactList(List<UserContact> contactList)
+    public void setContactList(List<User> contactList)
     {
         if(mUserList != null)
             mUserList.clear();

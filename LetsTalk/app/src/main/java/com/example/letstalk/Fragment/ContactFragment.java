@@ -20,7 +20,6 @@ import com.example.letstalk.AppConstant.AppConstant;
 import com.example.letstalk.Database.DatabaseHandler;
 import com.example.letstalk.LTModel.User;
 import com.example.letstalk.Adapter.MyContactAdapter;
-import com.example.letstalk.LTModel.UserContact;
 import com.example.letstalk.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,7 +49,7 @@ public class ContactFragment extends Fragment {
 
     User user;
 
-    List<UserContact> userList;
+    List<User> userList;
 
     //List<String> userContactList;
 
@@ -119,7 +118,7 @@ public class ContactFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Log.d(TAG, "onDataChange: "+dataSnapshot);
-                    List<UserContact> contactsList = new ArrayList<>();
+                    List<User> contactsList = new ArrayList<>();
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                         user = userSnapshot.getValue(User.class);
                         Log.d(TAG, "onDataChange: " + user);
@@ -134,7 +133,7 @@ public class ContactFragment extends Fragment {
                             Log.d(TAG, "onDataChange: inside If");
                             Log.d(TAG, "onDataChange: "+user.toString());
 
-                            UserContact userContact=new UserContact();
+                            User userContact=new User();
                             userContact.setUserName(userName);
                             userContact.setUserSurname(userSurName);
                             userContact.setUserMobile(userMobile);
@@ -158,7 +157,6 @@ public class ContactFragment extends Fragment {
                     Log.w(TAG, "Failed to read value.", databaseError.toException());
                 }
             });
-
 
             Log.d(TAG, "onCreateView: ");
             //Log.d(TAG, "Database Size: "+databaseHandler.displayUserID().size());

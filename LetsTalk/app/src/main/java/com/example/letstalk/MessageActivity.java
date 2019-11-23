@@ -1,7 +1,6 @@
 package com.example.letstalk;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,9 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,12 +18,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 
-import com.example.letstalk.Adapter.MyRecieverMessageAdapter;
+import com.example.letstalk.Adapter.MyMessageAdapter;
 import com.example.letstalk.AppConstant.AppConstant;
 import com.example.letstalk.Database.DatabaseHandler;
 import com.example.letstalk.LTModel.Message;
@@ -71,7 +67,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private RecyclerView mMessageRecyclerView;
 
-    private MyRecieverMessageAdapter mMyRecieverMessageAdapter;
+    private MyMessageAdapter mMyMessageAdapter;
 
     Toolbar toolbar;
 
@@ -119,9 +115,12 @@ public class MessageActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: "+messageList);
 
-        //mMyRecieverMessageAdapter = new MyRecieverMessageAdapter(context, new ArrayList<>());
-        mMyRecieverMessageAdapter = new MyRecieverMessageAdapter(context,messageList);
-        mMessageRecyclerView.setAdapter(mMyRecieverMessageAdapter);
+
+
+        //mMyMessageAdapter = new MyMessageAdapter(context, new ArrayList<>());
+        mMyMessageAdapter = new MyMessageAdapter(context,messageList);
+        mMessageRecyclerView.smoothScrollToPosition(mMyMessageAdapter.getItemCount());
+        mMessageRecyclerView.setAdapter(mMyMessageAdapter);
 
         //Drawable drawablle =getResources().getDrawable(R.drawable.ic_send_black_24dp);
         Drawable drawable = btnSend.getDrawable();
@@ -152,7 +151,10 @@ public class MessageActivity extends AppCompatActivity {
             if (bundle != null) {
 
                 String msgId = bundle.getString("messageId");
-                Log.d(TAG, "on BroadCast Receive: "+msgId);
+                String consId = bundle.getString("conversionId");
+
+                Log.d(TAG, "on BroadCast Receive consId: "+consId);
+                Log.d(TAG, "on BroadCast Receive msgId: "+msgId);
 
                 Log.d(TAG, "onReceive: senderID "+senderID);
 
@@ -160,12 +162,17 @@ public class MessageActivity extends AppCompatActivity {
                 DatabaseHandler handler = new DatabaseHandler(context);
                 Message msg = handler.getMessageById(msgId);
                 Log.d(TAG, "onReceive: conversationId "+msg.getConversionId());
-                mMyRecieverMessageAdapter.addMessageToAdapter(msg);
+                mMyMessageAdapter.addMessageToAdapter(msg);
             }
         }
     };
 
     public void sendMessage(View view) {
+
+        mMessageRecyclerView.smoothScrollToPosition(message.getBottom() );
+
+        //mMessageRecyclerView.
+
         timeStamp = System.currentTimeMillis();
         String time= String.valueOf(timeStamp);
         txtmessage = message.getText().toString().replace(" ","_");
@@ -173,9 +180,11 @@ public class MessageActivity extends AppCompatActivity {
         Log.d(TAG, "sendMessage: senderID"+senderID);
         Log.d(TAG, "sendMessage: recieverID"+reciverID);
         Log.d(TAG, "sendMessage: name"+ name);
+
         Retrofit retrofit = BaseApplication.getRetrofitInstance();
         FCMAPI api = retrofit.create(FCMAPI.class);
         MessageEntity messageEntity = new MessageEntity();
+
         Data data = new Data();
         data.senderId = senderID;
         data.receiverId = reciverID;
@@ -186,6 +195,7 @@ public class MessageActivity extends AppCompatActivity {
         messageEntity.to = "/topics/"+ reciverID;
         Log.d(TAG, "sendMessage: RecevierId : " + reciverID);
 
+        if(!txtmessage.equals(""))
         saveMessage(senderID,reciverID,messageID,txtmessage,time);
 
         api.sendMessage(messageEntity).enqueue(new Callback<ResponseBody>() {

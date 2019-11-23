@@ -21,7 +21,6 @@ import com.example.letstalk.Adapter.MyTabPagerAdapter;
 import com.example.letstalk.AppConstant.AppConstant;
 import com.example.letstalk.Database.DatabaseHandler;
 import com.example.letstalk.LTModel.User;
-import com.example.letstalk.LTModel.UserContact;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

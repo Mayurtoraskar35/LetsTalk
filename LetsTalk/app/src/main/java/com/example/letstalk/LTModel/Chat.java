@@ -8,7 +8,15 @@ public class Chat {
 
     public Message message;
 
-    public User user;
+    public User userContact;
+
+    public User getUserContact() {
+        return userContact;
+    }
+
+    public void setUserContact(User userContact) {
+        this.userContact = userContact;
+    }
 
     public int getChatId() {
         return chatId;
@@ -32,13 +40,5 @@ public class Chat {
 
     public void setMessage(Message message) {
         this.message = message;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }
