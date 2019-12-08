@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -8,13 +9,14 @@
     >
 
     <androidx.cardview.widget.CardView
-        android:layout_gravity="end"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         app:cardCornerRadius="15dp"
         app:cardBackgroundColor="#B81596"
-        android:minWidth="80dp">
+        android:minWidth="80dp"
+        android:id="@+id/cardview"
+        tools:ignore="MissingConstraints">
 
     <TextView
         android:id="@+id/messagebody"
@@ -29,12 +31,21 @@
         android:textSize="14sp" />
     </androidx.cardview.widget.CardView>
     <TextView
+        app:layout_constraintTop_toBottomOf="@id/cardview"
+        app:layout_constraintEnd_toStartOf="@id/delivaryStatus"
         android:text="02:12 PM"
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
         android:layout_marginRight="8dp"
         />
+    <ImageView
+        android:id="@+id/delivaryStatus"
+        app:layout_constraintTop_toBottomOf="@id/cardview"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:foregroundGravity="right"
+        android:layout_gravity="end"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

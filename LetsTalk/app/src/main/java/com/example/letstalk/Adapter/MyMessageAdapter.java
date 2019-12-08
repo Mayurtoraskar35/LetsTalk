@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -66,6 +67,7 @@ public class MyMessageAdapter extends RecyclerView.Adapter<MyMessageAdapter.MyMe
     public void onBindViewHolder(@NonNull MyMessageViewHolder holder, int position) {
         Message message = mMessageList.get(position);
         holder.txtReciverMessgeBody.setText(message.getBody().replace("_"," "));
+        holder.imgDelivaryStatus.setImageResource(R.drawable.ic_access_time_black_24dp);
 
         Long time = Long.parseLong(message.getTimeStamp());
         DateFormat dateFormat = new SimpleDateFormat("hh:mm aa");
@@ -104,10 +106,12 @@ public class MyMessageAdapter extends RecyclerView.Adapter<MyMessageAdapter.MyMe
     class MyMessageViewHolder extends RecyclerView.ViewHolder{
         TextView txtReciverMessgeBody;
         TextView txtTimeStamp;
+        ImageView imgDelivaryStatus;
         public MyMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             txtReciverMessgeBody = itemView.findViewById(R.id.messagebody);
             txtTimeStamp = itemView.findViewById(R.id.timestamp);
+            imgDelivaryStatus = itemView.findViewById(R.id.delivaryStatus);
         }
     }
 }

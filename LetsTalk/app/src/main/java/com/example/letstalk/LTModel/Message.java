@@ -12,6 +12,16 @@ public class Message {
 
     public String timeStamp;
 
+    public String deliveryStatus;
+
+    public String getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
     public String getSenderId() {
         return senderId;
     }

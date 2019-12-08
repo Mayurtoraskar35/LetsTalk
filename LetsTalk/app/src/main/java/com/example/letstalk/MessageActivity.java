@@ -53,7 +53,7 @@ public class MessageActivity extends AppCompatActivity {
 
     TextView userName;
 
-    String reciverID, name, mobile, txtmessage, senderID, messageID;
+    String reciverID, name, mobile, txtmessage, senderID, messageID, delivaryStatus;
 
     private long timeStamp;
 
@@ -191,12 +191,19 @@ public class MessageActivity extends AppCompatActivity {
         data.body = txtmessage;
         data.messageId = messageID;
         data.timeStamp = timeStamp;
+        data.name = name;
         messageEntity.data = data;
         messageEntity.to = "/topics/"+ reciverID;
         Log.d(TAG, "sendMessage: RecevierId : " + reciverID);
 
+        delivaryStatus ="Pending";
+
         if(!txtmessage.equals(""))
-        saveMessage(senderID,reciverID,messageID,txtmessage,time);
+        {
+
+            Log.d(TAG, "sendMessage: delivary Status : "+delivaryStatus);
+            saveMessage(senderID, reciverID, messageID, txtmessage, time, delivaryStatus);
+        }
 
         api.sendMessage(messageEntity).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -205,6 +212,8 @@ public class MessageActivity extends AppCompatActivity {
                 if (response.code() == 200)
                 {
                     Log.d(TAG, "onResponse: MessageEntity send successfully");
+                    delivaryStatus = "send";
+                    messageDatabaseHandler.updateMessage(delivaryStatus, messageID);
                 }
                 else
                     {
@@ -218,7 +227,7 @@ public class MessageActivity extends AppCompatActivity {
         message.setText("");
     }
 
-    public void saveMessage(String senderID, String reciverID, String messageID, String body, String timeStamp){
+    public void saveMessage(String senderID, String reciverID, String messageID, String body, String timeStamp, String deliveryStatus){
 
         Log.d(TAG, "saveMessage: ");
         Log.d(TAG, "saveMessage: sernderID "+senderID);
@@ -234,8 +243,11 @@ public class MessageActivity extends AppCompatActivity {
         message.setBody(body);
         message.setTimeStamp(timeStamp);
         message.setSenderId(senderID);
+        message.setDeliveryStatus(deliveryStatus);
 
         Log.d(TAG, "MessageEntity Class: "+message.toString());
+
+        Log.d(TAG, "sendMessage: delivary Status : "+delivaryStatus);
 
         messageDatabaseHandler.insertMessage(message);
 

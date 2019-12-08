@@ -34,6 +34,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         this.context=context;
     }
 
+    public void updateMessage(String delivaryStatus, String messageID) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Messages.DELIVERY_STATUS, delivaryStatus);
+        long raw = database.update(Messages.TABLE_NAME, contentValues, Messages.MESSAGE_ID + "=?", new String[]{String.valueOf(messageID)});
+        Log.d(TAG, "inside updateStudent : Row : " + raw);
+    }
+
     public static class Users{
         public static final String TABLE_NAME="contact";
         public static final String ID="id";
@@ -51,6 +59,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         public static final String MESSAGE_ID = "message_id";
         public static final String BODY = "body";
         public static final String TIME_STAMP = "time_stamp";
+        public static final String DELIVERY_STATUS = "delivery_status";
     }
 
     public static class Chats {
@@ -77,7 +86,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Messages.CONVERSION_ID +" text, "+
                 Messages.MESSAGE_ID +" text, "+
                 Messages.BODY +" text, "+
-                Messages.TIME_STAMP+" text);";
+                Messages.TIME_STAMP+" text, "+
+                Messages.DELIVERY_STATUS+" text );";
         sqLiteDatabase.execSQL(createMessageQuery);
 
         String createChatQuery="create table "+ Chats.TABLE_NAME+" ( "+
@@ -104,6 +114,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(Messages.BODY,message.getBody());
         contentValues.put(Messages.TIME_STAMP,message.getTimeStamp());
         contentValues.put(Messages.SENDER_ID,message.getSenderId());
+        contentValues.put(Messages.DELIVERY_STATUS,message.getDeliveryStatus());
+
+        Log.d(TAG, "insertMessage: delivary Status : "+message.getDeliveryStatus());
+
         long row= database.insertWithOnConflict(Messages.TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_IGNORE);
         Log.d(TAG,"Inside insertStudent() -> Row : "+row);
 
@@ -271,6 +285,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         return chatList;
     }
+
+
 
     public Chat getChatByConversationId(String conversionID) {
         Log.d( TAG, "getChatByConversationId: " + conversionID );
